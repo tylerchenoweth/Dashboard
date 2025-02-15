@@ -8,6 +8,10 @@ import numpy as np
 router = APIRouter()
 
 
+def get_grams_to_lbs(weight):
+    return round((weight / 4.53592), 2)
+
+
 def format_data(data):
 
     # Extract and format the data
@@ -16,7 +20,7 @@ def format_data(data):
         "image": data["sprites"]["front_default"],
         "order": data["id"],
         "type": data["types"][0]["type"]["name"], 
-        "weight": data["weight"],
+        "weight": get_grams_to_lbs( data["weight"] ),
         "gif": data["sprites"]["other"]["showdown"]["front_default"]
     }
 
