@@ -27,10 +27,14 @@ def format_data(data):
     return context
 
 
-
 @router.get("")
+async def poke_api_home():
+    return "Welcome to the PokeAPI routes!"
+
+
+@router.get("/random")
 async def get_pokeapi():
- 
+    
     data = await pokeapi_api.get_random_pokemon()  # Call the function from the API file
     context = format_data(data)
 
@@ -38,9 +42,51 @@ async def get_pokeapi():
 
 
 @router.get("/first_gen/{pokemon_id}")
-async def get_pokeapi(pokemon_id: int = Path(..., ge=1, le=151) ):
+async def get_pokemon_by_id(pokemon_id: int = Path(..., ge=1, le=151) ):
 
     data = await pokeapi_api.get_pokemon_by_id(pokemon_id)  # Call the function from the API file
     context = format_data(data)
 
     return context
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

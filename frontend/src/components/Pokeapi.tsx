@@ -14,12 +14,54 @@ type Pokemon = {
 export default function Pokemon() {
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
 
-  useEffect(() => {
-    fetch("http://localhost:8000/pokeapi/")
-      .then((res) => res.json())
-      .then((data) => setPokemon(data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  // useEffect(() => {
+  //   fetch("http://localhost:8000/pokeapi/random")
+  //     .then((res) => res.json())
+  //     .then((data) => setPokemon(data))
+  //     .catch((error) => console.error("Error fetching data:", error));
+  // }, []);
+
+
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//         const response = await fetch("http://localhost:8000/pokeapi/random");
+//         const data = await response.json();
+//         setPokemon(data);
+//     };
+
+//     fetchData(); // Fetch on load
+//     const interval = setInterval(fetchData, 10000); // Fetch every 60 seconds
+
+//     return () => clearInterval(interval); // Cleanup on unmount
+// }, []);
+
+useEffect(() => {
+  const fetchData = async () => {
+      try {
+          const response = await fetch("http://localhost:8000/pokeapi/random");
+          const data = await response.json();
+
+          // Update only if the fetched Pokémon is different
+          setPokemon((prevPokemon) => {
+              return prevPokemon?.order !== data.order ? data : prevPokemon;
+          });
+      } catch (error) {
+          console.error("Error fetching data:", error);
+      }
+  };
+
+  fetchData(); // Fetch immediately on load
+
+  const interval = setInterval(fetchData, 10000); // Poll every 10 seconds
+
+  return () => clearInterval(interval); // Cleanup on unmount
+}, []);
+
+
+
+
+
 
   if (!pokemon) return <p>Loading...</p>;
 

@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from routers import pokeapi_router
-
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -20,3 +19,4 @@ def first_example():
 
 
 app.include_router(pokeapi_router.router, prefix="/pokeapi", tags=["POKE API"])
+
