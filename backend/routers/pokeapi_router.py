@@ -71,7 +71,17 @@ from threading import Thread
 
 app = FastAPI()
 router = APIRouter()
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+# redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+
+import os
+
+
+redis_host = os.getenv("REDIS_HOST", "redis")  # Use Docker service name
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+
+redis_client = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True)
+
+
 
 API_URL = "https://api.example.com/data"
 UPDATE_INTERVAL = 60  # Fetch new data every 60 seconds
