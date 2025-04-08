@@ -84,7 +84,7 @@ redis_client = redis.Redis(host=redis_host, port=redis_port, db=0, decode_respon
 
 
 API_URL = "https://api.example.com/data"
-UPDATE_INTERVAL = 60  # Fetch new data every 60 seconds
+UPDATE_INTERVAL = 10  # Fetch new data every 60 seconds
 
 
 
@@ -101,23 +101,32 @@ UPDATE_INTERVAL = 60  # Fetch new data every 60 seconds
 import random
 
 
-
-
 def fetch_and_store_data():
     while True:
         randNum = random.randint(1, 151)
-        response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{randNum}")
+
+        try:
+            response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{randNum}")
+        except requests.exceptions.ConnectionError:
+            print("\nConnection Error...")
+        except:
+            print("\n404\n")
+
         
         if response.status_code == 200:
+            print("\n200 RESPONSE\n")
             data = response.json()
             data = data['name']
             redis_client.set("latest_data", json.dumps(data))
+        
         time.sleep(UPDATE_INTERVAL)
         print("GETTING API DATA")
+
 
 @router.on_event("startup")
 def startup_event():
     Thread(target=fetch_and_store_data, daemon=True).start()
+
 
 @router.get("/data")
 def get_latest_data():
@@ -125,7 +134,9 @@ def get_latest_data():
     return json.loads(data) if data else {"message": "No data available"}
 
 
-
+@router.get("/something")
+def something():
+    return "somethingsomethingsomething"
 
 
 
