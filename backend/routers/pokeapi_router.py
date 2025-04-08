@@ -69,36 +69,19 @@ import json
 import time
 from threading import Thread
 
+import os
+import random
+
 app = FastAPI()
 router = APIRouter()
-# redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-
-import os
-
 
 redis_host = os.getenv("REDIS_HOST", "redis")  # Use Docker service name
 redis_port = int(os.getenv("REDIS_PORT", 6379))
 
 redis_client = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True)
 
-
-
 API_URL = "https://api.example.com/data"
-UPDATE_INTERVAL = 10  # Fetch new data every 60 seconds
-
-
-
-
-
-
-
-# url = f"https://pokeapi.co/api/v2/pokemon/{randNum}"
-# response = await client.get(url)
-# data = response.json()
-
-# return data
-
-import random
+UPDATE_INTERVAL = 30  # Fetch new data every 60 seconds
 
 
 def fetch_and_store_data():
@@ -106,18 +89,20 @@ def fetch_and_store_data():
         randNum = random.randint(1, 151)
 
         try:
-            response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{randNum}")
+            response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{randNum}", timeout=5)
+
+            if response.status_code == 200:
+                print("\n200 RESPONSE\n")
+                data = response.json()
+                data = data['name']
+                redis_client.set("latest_data", json.dumps(data))
+            else:
+                print(f"\nUnexpected status code: {response.status_code}\n")
+                
         except requests.exceptions.ConnectionError:
             print("\nConnection Error...")
-        except:
-            print("\n404\n")
-
-        
-        if response.status_code == 200:
-            print("\n200 RESPONSE\n")
-            data = response.json()
-            data = data['name']
-            redis_client.set("latest_data", json.dumps(data))
+        except Exception as e:
+            print(f"\nUnexpected error: {e}\n")
         
         time.sleep(UPDATE_INTERVAL)
         print("GETTING API DATA")
