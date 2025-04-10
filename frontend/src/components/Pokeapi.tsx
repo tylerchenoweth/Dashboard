@@ -128,7 +128,7 @@
 
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:8000/pokeapi/data";
+const API_URL = "http://localhost:8000/pokeapi/randomoriginal";
 
 export default function DataDisplay() {
   const [data, setData] = useState(null);
